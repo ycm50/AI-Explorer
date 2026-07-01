@@ -24,15 +24,4 @@ object BrowserUtils {
         context.startActivity(intent)
     }
 
-    /**
-     * 弹出系统选择器，列出所有能打开网址的 App（浏览器），让用户选。
-     * 这是 Android 标准的「通过系统接口」方式。
-     */
-    fun searchWithChooser(context: Context, query: String) {
-        val url = "$GOOGLE_SEARCH_URL${URLEncoder.encode(query, "UTF-8")}"
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(Intent.createChooser(intent, "选择浏览器"))
-    }
 }

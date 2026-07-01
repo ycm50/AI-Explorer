@@ -2,7 +2,6 @@ package com.aiexplorer.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,8 +38,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aiexplorer.data.LlmClient
@@ -60,8 +57,6 @@ fun SettingsScreen(
     var apiKey by remember { mutableStateOf(settings.apiKey) }
     var model by remember { mutableStateOf(settings.model) }
     var promptTemplate by remember { mutableStateOf(settings.promptTemplate) }
-    var showApiKey by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -98,22 +93,8 @@ fun SettingsScreen(
             placeholder = { Text("sk-...") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            visualTransformation = if (showApiKey) VisualTransformation.None
-            else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = inputFieldColors(),
-            trailingIcon = {
-                Text(
-                    text = if (showApiKey) "隐藏" else "显示",
-                    color = MiuixTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                        ) { showApiKey = !showApiKey },
-                )
-            },
         )
 
         Spacer(Modifier.height(12.dp))

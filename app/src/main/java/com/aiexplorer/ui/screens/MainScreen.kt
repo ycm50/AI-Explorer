@@ -1,10 +1,8 @@
 package com.aiexplorer.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +17,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -188,27 +185,16 @@ fun MainScreen() {
 
             Spacer(Modifier.height(16.dp))
 
-            // 浏览器搜索按钮
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            // 浏览器搜索
+            Button(
+                onClick = { BrowserUtils.searchDefault(context, searchQuery) },
+                modifier = Modifier.fillMaxWidth().height(44.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MiuixTheme.colorScheme.primary,
+                    contentColor = MiuixTheme.colorScheme.onPrimary,
+                ),
             ) {
-                Button(
-                    onClick = { BrowserUtils.searchDefault(context, searchQuery) },
-                    modifier = Modifier.weight(1f).height(44.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MiuixTheme.colorScheme.primary,
-                        contentColor = MiuixTheme.colorScheme.onPrimary,
-                    ),
-                ) {
-                    Text("默认浏览器搜索", fontSize = 14.sp)
-                }
-                OutlinedButton(
-                    onClick = { BrowserUtils.searchWithChooser(context, searchQuery) },
-                    modifier = Modifier.weight(1f).height(44.dp),
-                ) {
-                    Text("选择浏览器", color = MiuixTheme.colorScheme.onBackground, fontSize = 14.sp)
-                }
+                Text("在浏览器中搜索", fontSize = 14.sp)
             }
         }
     }

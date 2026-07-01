@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        maven { url = uri("${rootProject.projectDir}/kit") }
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -7,7 +8,6 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
-        maven { url = uri("${rootProject.projectDir}/kit") }
         mavenCentral()
         gradlePluginPortal()
     }
@@ -18,8 +18,8 @@ plugins {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        google()
         maven { url = uri("${rootProject.projectDir}/kit") }
+        google()
         mavenCentral()
     }
 }
