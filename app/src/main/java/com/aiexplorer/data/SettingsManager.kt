@@ -27,11 +27,22 @@ class SettingsManager(context: Context) {
         get() = prefs.getString(KEY_PROMPT, DEFAULT_PROMPT) ?: DEFAULT_PROMPT
         set(value) = prefs.edit().putString(KEY_PROMPT, value).apply()
 
+    /** 应用内 WebView 搜索使用的搜索引擎 id。 */
+    var searchEngineId: String
+        get() = prefs.getString(KEY_SEARCH_ENGINE, SearchEngine.DEFAULT_ID)
+            ?: SearchEngine.DEFAULT_ID
+        set(value) = prefs.edit().putString(KEY_SEARCH_ENGINE, value).apply()
+
+    /** 当前选中的搜索引擎。 */
+    val searchEngine: SearchEngine
+        get() = SearchEngine.findById(searchEngineId)
+
     companion object {
         private const val KEY_BASE_URL = "base_url"
         private const val KEY_API_KEY = "api_key"
         private const val KEY_MODEL = "model"
         private const val KEY_PROMPT = "prompt_template"
+        private const val KEY_SEARCH_ENGINE = "search_engine"
 
         const val DEFAULT_BASE_URL = "https://api.deepseek.com/v1"
         const val DEFAULT_MODEL = "deepseek-chat"

@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aiexplorer.data.LlmClient
 import com.aiexplorer.data.ModelInfo
+import com.aiexplorer.data.SearchEngine
 import com.aiexplorer.data.SettingsManager
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -57,6 +58,7 @@ fun SettingsScreen(
     var apiKey by remember { mutableStateOf(settings.apiKey) }
     var model by remember { mutableStateOf(settings.model) }
     var promptTemplate by remember { mutableStateOf(settings.promptTemplate) }
+    var searchEngine by remember { mutableStateOf(settings.searchEngine) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -233,6 +235,49 @@ fun SettingsScreen(
         // 选中模型后隐藏列表
         Spacer(Modifier.height(12.dp))
 
+        // --- 默认搜索引擎（应用内 WebView 使用）---
+        SectionLabel("默认搜索引擎")
+        Column(modifier = Modifier.fillMaxWidth()) {
+            SearchEngine.BUILT_IN.forEachIndexed { index, engine ->
+                val isSelected = engine.id == searchEngine.id
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { searchEngine = engine }
+                        .background(
+                            if (isSelected) MiuixTheme.colorScheme.primary.copy(alpha = 0.12f)
+                            else Color.Transparent
+                        )
+                        .padding(horizontal = 12.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = engine.displayName,
+                        fontSize = 15.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isSelected) MiuixTheme.colorScheme.primary
+                        else MiuixTheme.colorScheme.onBackground,
+                        modifier = Modifier.weight(1f),
+                    )
+                    if (isSelected) {
+                        Text(
+                            text = "✓",
+                            fontSize = 15.sp,
+                            color = MiuixTheme.colorScheme.primary,
+                        )
+                    }
+                }
+                if (index < SearchEngine.BUILT_IN.lastIndex) {
+                    HorizontalDivider(
+                        color = MiuixTheme.colorScheme.dividerLine,
+                        thickness = 0.5.dp,
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
         SectionLabel("提示词（System Prompt）")
         OutlinedTextField(
             value = promptTemplate,
@@ -252,6 +297,7 @@ fun SettingsScreen(
                 settings.apiKey = apiKey
                 settings.model = model
                 settings.promptTemplate = promptTemplate
+                settings.searchEngineId = searchEngine.id
                 onNavigateBack()
             },
             modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -261,6 +307,24 @@ fun SettingsScreen(
             ),
         ) {
             Text("保存并返回", fontSize = 16.sp)
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // 恢复默认：把表单字段还原为内置默认值。
+        // 刻意不动 API Key —— 那是用户的凭据，误触清空代价太高。
+        OutlinedButton(
+            onClick = {
+                baseUrl = SettingsManager.DEFAULT_BASE_URL
+                model = SettingsManager.DEFAULT_MODEL
+                promptTemplate = SettingsManager.DEFAULT_PROMPT
+                searchEngine = SearchEngine.findById(SearchEngine.DEFAULT_ID)
+                showModelDropdown = false
+                modelError = null
+            },
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+        ) {
+            Text("恢复默认", color = MiuixTheme.colorScheme.onBackground, fontSize = 16.sp)
         }
 
         Spacer(Modifier.height(8.dp))

@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.AIExplorer" parent="Theme.AppCompat.Light.DarkActionBar">
+    <!-- 使用 DayNight 变体，让窗口背景/状态栏等跟随系统深浅色，
+         与 Compose 中的 AiExplorerTheme 保持一致（否则深色模式下会先闪一下浅色窗口）。 -->
+    <style name="Theme.AIExplorer" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <!-- Customize your theme here. -->
     </style>
 </resources>

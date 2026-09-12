@@ -38,19 +38,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aiexplorer.data.SearchEngine
 import com.aiexplorer.ui.screens.MainScreen
 import com.aiexplorer.ui.screens.SettingsScreen
+import com.aiexplorer.ui.screens.WebViewScreen
+import com.aiexplorer.ui.theme.AiExplorerTheme
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.theme.lightColorScheme
 
-private enum class Screen { MAIN, SETTINGS }
+private enum class Screen { MAIN, SETTINGS, WEBVIEW }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MiuixTheme(colors = lightColorScheme()) {
+            AiExplorerTheme {
                 AppContent()
             }
         }
@@ -61,16 +63,19 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun AppContent() {
     var screen by remember { mutableStateOf(Screen.MAIN) }
+    // 应用内 WebView 搜索的目标（进入 WEBVIEW 页时使用）
+    var webEngine by remember { mutableStateOf<SearchEngine?>(null) }
+    var webQuery by remember { mutableStateOf("") }
     val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val activity = LocalContext.current as ComponentActivity
 
-    // 返回键处理：设置页→主页，主页→退出
+    // 返回键处理：设置页/WebView 页 → 主页，主页 → 退出
     BackHandler(enabled = true) {
-        if (screen == Screen.SETTINGS) {
-            screen = Screen.MAIN
-        } else {
+        if (screen == Screen.MAIN) {
             activity.finish()
+        } else {
+            screen = Screen.MAIN
         }
     }
 
@@ -137,7 +142,11 @@ private fun AppContent() {
                             Text("☰", fontSize = 22.sp, color = MiuixTheme.colorScheme.onBackground)
                         }
                         Text(
-                            text = if (screen == Screen.MAIN) "AI Explorer" else "设置",
+                            text = when (screen) {
+                                Screen.MAIN -> "AI Explorer"
+                                Screen.SETTINGS -> "设置"
+                                Screen.WEBVIEW -> "搜索结果"
+                            },
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = MiuixTheme.colorScheme.onBackground,
@@ -158,10 +167,28 @@ private fun AppContent() {
                     animationSpec = tween(durationMillis = 500),
                 ) { currentScreen ->
                     when (currentScreen) {
-                        Screen.MAIN -> MainScreen()
+                        Screen.MAIN -> MainScreen(
+                            onOpenWebView = { engine, query ->
+                                webEngine = engine
+                                webQuery = query
+                                screen = Screen.WEBVIEW
+                            },
+                        )
+
                         Screen.SETTINGS -> SettingsScreen(
                             onNavigateBack = { screen = Screen.MAIN },
                         )
+
+                        Screen.WEBVIEW -> {
+                            // 进入该页前必定已赋值 engine，这里仅作兜底
+                            webEngine?.let { engine ->
+                                WebViewScreen(
+                                    engine = engine,
+                                    query = webQuery,
+                                    onClose = { screen = Screen.MAIN },
+                                )
+                            }
+                        }
                     }
                 }
             }
